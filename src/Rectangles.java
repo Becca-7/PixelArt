@@ -11,7 +11,7 @@ public class Rectangles {
         public Rectangle rec;
         public Image pic;
         public int colorCode;
-
+//
 
 
 
