@@ -7,10 +7,15 @@
 
 //Graphics Libraries
 
+import com.sun.org.apache.xpath.internal.operations.Or;
+
 import java.awt.Graphics2D;
 import java.awt.image.BufferStrategy;
 import java.awt.*;
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import java.awt.event.*;
+
 
 /***
  * Step 0 for keyboard control - Import
@@ -20,194 +25,179 @@ import java.awt.event.*;
 /***
  * Step 1 for keyboard control - implements KeyListener
  */
-public class CheeseWorld implements Runnable, KeyListener {
+public class CheeseWorld implements MouseListener, Runnable, KeyListener {
 
-    //Variable Definition Section
-
-    //Sets the width and height of the program window
     final int WIDTH = 1000;
     final int HEIGHT = 700;
 
-    //Declare the variables needed for the graphics
     public JFrame frame;
     public Canvas canvas;
     public JPanel panel;
     public BufferStrategy bufferStrategy;
 
-    public boolean gameStart = false;
-
-    //Declare the variables needed for images
-    public Image cheesePic;
+    public Image EmptyPixelPic;
+    public Image RedPic;
+    public Image OrangePic;
+    public Image GoldPic;
+    public Image YellowPic;
+    public Image LimePic;
+    public Image GreenPic;
+    public Image TealPic;
+    public Image NavyPic;
+    public Image VioletPic;
+    public Image PurplePic;
+    public Image PinkPic;
+    public Image BlackPic;
+    public Image WhitePic;
+    public Image BrownPic;
     public Image mousePic;
     public Image tomPic;
+    public Image ErasePic;
+    public Image ResetPic;
 
-    //Declare the character objects
-    public Mouse mouse1;
-    public Cheese theCheese;
-    public Cheese cheese2;
-    public Cheese[] stinky;
+    public Rectangles RedRec;
+    public Rectangles OrangeRec;
+    public Rectangles GoldRec;
+    public Rectangles YellowRec;
+    public Rectangles LimeRec;
+    public Rectangles GreenRec;
+    public Rectangles TealRec;
+    public Rectangles NavyRec;
+    public Rectangles VioletRec;
+    public Rectangles PurpleRec;
+    public Rectangles PinkRec;
+    public Rectangles BlackRec;
+    public Rectangles WhiteRec;
+    public Rectangles BrownRec;
+    public Rectangles EraseRec;
+    public Rectangles ResetRec;
+
+    public Rectangles[][] rectangles;
+
+    public int mouseX, mouseY;
+    public int colorCount=1;
 
 
-    public Player user;
-
-    // Main method definition
-    // This is the code that runs first and automatically
     public static void main(String[] args) {
         CheeseWorld myApp = new CheeseWorld();   //creates a new instance of the game
         new Thread(myApp).start();               //creates a threads & starts up the code in the run( ) method
     }
 
-    // Constructor Method - setup portion of the program
-    // Initialize your variables and construct your program objects here.
     public CheeseWorld() {
 
         setUpGraphics();
-
-        /***
-         * Step 3 for keyboard control - addKeyListener(this) to the canvas
-         */
         canvas.addKeyListener(this);
+        canvas.addMouseListener(this);
 
-        //load images
-        cheesePic = Toolkit.getDefaultToolkit().getImage("cheese.gif");
-        mousePic = Toolkit.getDefaultToolkit().getImage("jerry.gif");
-        tomPic = Toolkit.getDefaultToolkit().getImage("tomCat.png");
+        EmptyPixelPic =Toolkit.getDefaultToolkit().getImage("RealEmpty.png");
+        ResetPic =Toolkit.getDefaultToolkit().getImage("Reset.png");
+        ErasePic =Toolkit.getDefaultToolkit().getImage("Erase.png");
 
-        //create (construct) the objects needed for the game
-        mouse1 = new Mouse(200, 300, 4, 4, mousePic);
-        theCheese = new Cheese(400, 300, 3, -4, cheesePic);
-        cheese2 = new Cheese(200, 500, 0, 0, cheesePic);
-        // construct stinky array
-        stinky = new Cheese[5];
-        // fill stinky array with constructed cheese
-        for (int x = 0; x < stinky.length; x++) {
-            stinky[x] = new Cheese(x*100+400, 400, 4, 3, cheesePic);
-        }
-        // stinky[0].xpos
-        user = new Player(250, 250, 0, 0, tomPic);
+        RedPic =Toolkit.getDefaultToolkit().getImage("Red1.png");
+        OrangePic =Toolkit.getDefaultToolkit().getImage("Orange2.png");
+        GoldPic =Toolkit.getDefaultToolkit().getImage("Gold3.png");
+        YellowPic =Toolkit.getDefaultToolkit().getImage("Yellow4.png");
+        LimePic =Toolkit.getDefaultToolkit().getImage("Lime5.png");
+        GreenPic =Toolkit.getDefaultToolkit().getImage("Green6.png");
+        TealPic =Toolkit.getDefaultToolkit().getImage("Teal7.png");
+        NavyPic =Toolkit.getDefaultToolkit().getImage("Navy8.png");
+        VioletPic =Toolkit.getDefaultToolkit().getImage("Violet9.png");
+        PurplePic =Toolkit.getDefaultToolkit().getImage("Purple10.png");
+        PinkPic =Toolkit.getDefaultToolkit().getImage("Pink11.png");
+        BlackPic =Toolkit.getDefaultToolkit().getImage("Black12.png");
+        WhitePic =Toolkit.getDefaultToolkit().getImage("White13.png");
+        BrownPic =Toolkit.getDefaultToolkit().getImage("Brown14.png");
 
-    } // CheeseWorld()
+        rectangles=new Rectangles[20][20];
+
+           for (int c = 0; c < rectangles.length; c++) {
+               for (int r = 0; r < rectangles.length; r++) {
+                rectangles[c][r]=new Rectangles(r*50,c*50, EmptyPixelPic,0);
+               }
+           }
+
+        RedRec=new Rectangles(100,650, RedPic,1);
+        OrangeRec=new Rectangles(150,650, OrangePic,2);
+        GoldRec=new Rectangles(200,650, GoldPic,3);
+        YellowRec=new Rectangles(250,650, YellowPic,4);
+        LimeRec=new Rectangles(300,650, LimePic,5);
+        GreenRec=new Rectangles(350,650, GreenPic,6);
+        TealRec=new Rectangles(400,650, TealPic,7);
+        NavyRec=new Rectangles(450,650, NavyPic,8);
+        VioletRec=new Rectangles(500,650, VioletPic,9);
+        PurpleRec=new Rectangles(550,650, PurplePic,10);
+        PinkRec=new Rectangles(600,650, PinkPic,11);
+        BlackRec=new Rectangles(650,650, BlackPic,12);
+        WhiteRec=new Rectangles(700,650, WhitePic,13);
+        BrownRec=new Rectangles(750,650, BrownPic,14);
+        EraseRec=new Rectangles(800,650, ErasePic,0);
+        ResetRec=new Rectangles(850,650, ResetPic,0);
 
 
-//*******************************************************************************
-//User Method Section
 
-    // main thread
-    // this is the code that plays the game after you set things up
+
+    }
+
+
     public void moveThings() {
-        mouse1.move();
-        theCheese.move();
-        for (int x = 0; x < stinky.length; x++) {
-            stinky[x].move();
-        }
-        user.move3();
     }
 
     public void checkIntersections() {
-
-        for (int x = 0; x < stinky.length; x++) {
-            if (stinky[x].rec.intersects(mouse1.rec)) {
-                stinky[x].isAlive = false;
-            }
-        }
-
     }
 
     public void run() {
         while (true) {
-            if (gameStart == true) {
-                moveThings();           //move all the game objects
-                checkIntersections();   // check character crashes
-            }
+            moveThings();           //move all the game objects
+            checkIntersections();   // check character crashes
             render();               // paint the graphics
             pause(20);         // sleep for 20 ms
         }
     }
-
-    //paints things on the screen using bufferStrategy
     public void render() {
         Graphics2D g = (Graphics2D) bufferStrategy.getDrawGraphics();
         g.clearRect(0, 0, WIDTH, HEIGHT);
 
-        if (gameStart == false) {
-            g.setColor(Color.PINK);
-            g.fillRect(0,0,WIDTH, HEIGHT);
-            g.setColor(Color.BLACK);
-            g.drawString("Press enter to start", 350, 250);
-        } // draw start screen
-        else { // gameStart is true
-            //draw characters to the screen
-            g.drawImage(mouse1.pic, mouse1.xpos, mouse1.ypos, mouse1.width, mouse1.height, null);
-            g.drawImage(theCheese.pic, theCheese.xpos, theCheese.ypos, theCheese.width, theCheese.height, null);
-            g.drawImage(cheese2.pic, cheese2.xpos, cheese2.ypos, cheese2.width, cheese2.height, null);
-            // render all the stinky cheeses
-            for (int x = 0; x < stinky.length; x++) {
-                if (stinky[x].isAlive == true) {
-                    g.drawImage(stinky[x].pic, stinky[x].xpos, stinky[x].ypos, stinky[x].width, stinky[x].height, null);
+            for (int c = 0; c < rectangles.length; c++) {
+                for (int r = 0; r < rectangles.length; r++) {
+                    if (rectangles[c][r].isAlive == true) {
+                        g.drawImage(rectangles[c][r].pic, rectangles[c][r].xpos, rectangles[c][r].ypos, rectangles[c][r].width, rectangles[c][r].height, null);
+                    }
                 }
             }
-            g.drawImage(user.pic, user.xpos, user.ypos, user.width, user.height, null);
-        }
+            g.drawImage(RedRec.pic,RedRec.xpos,RedRec.ypos,RedRec.width,RedRec.height,null);
+            g.drawImage(OrangeRec.pic,OrangeRec.xpos,OrangeRec.ypos,OrangeRec.width,OrangeRec.height,null);
+            g.drawImage(GoldRec.pic,GoldRec.xpos,GoldRec.ypos,GoldRec.width,GoldRec.height,null);
+            g.drawImage(YellowRec.pic,YellowRec.xpos,YellowRec.ypos,YellowRec.width,YellowRec.height,null);
+            g.drawImage(LimeRec.pic,LimeRec.xpos,LimeRec.ypos,LimeRec.width,LimeRec.height,null);
+            g.drawImage(GreenRec.pic,GreenRec.xpos,GreenRec.ypos,GreenRec.width,GreenRec.height,null);
+            g.drawImage(TealRec.pic,TealRec.xpos,TealRec.ypos,TealRec.width,TealRec.height,null);
+            g.drawImage(NavyRec.pic,NavyRec.xpos,NavyRec.ypos,NavyRec.width,NavyRec.height,null);
+            g.drawImage(VioletRec.pic,VioletRec.xpos,VioletRec.ypos,VioletRec.width,VioletRec.height,null);
+            g.drawImage(PurpleRec.pic,PurpleRec.xpos,PurpleRec.ypos,PurpleRec.width,PurpleRec.height,null);
+            g.drawImage(PinkRec.pic,PinkRec.xpos,PinkRec.ypos,PinkRec.width,PinkRec.height,null);
+            g.drawImage(BlackRec.pic,BlackRec.xpos,BlackRec.ypos,BlackRec.width,BlackRec.height,null);
+            g.drawImage(WhiteRec.pic,WhiteRec.xpos,WhiteRec.ypos,WhiteRec.width,WhiteRec.height,null);
+            g.drawImage(BrownRec.pic,BrownRec.xpos,BrownRec.ypos,BrownRec.width,BrownRec.height,null);
+            g.drawImage(EraseRec.pic,EraseRec.xpos,EraseRec.ypos,EraseRec.width,EraseRec.height,null);
+            g.drawImage(ResetRec.pic,ResetRec.xpos,ResetRec.ypos,ResetRec.width,ResetRec.height,null);
 
         g.dispose();
         bufferStrategy.show();
     }
 
-    /***
-     * Step 4 for keyboard control - add required methods
-     * You need to have all 3 even if you aren't going to use them all
-     */
+
     public void keyPressed(KeyEvent event) {
         //This method will do something whenever any key is pressed down.
         //Put if( ) statements here
         char key = event.getKeyChar();     //gets the character of the key pressed
         int keyCode = event.getKeyCode();  //gets the keyCode (an integer) of the key pressed
         System.out.println("Key Pressed: " + key + "  Code: " + keyCode);
-
-        if (keyCode == 10) { // start game with enter key
-            gameStart = true;
-        }
-
-        if (keyCode == 68) { // d
-            user.right = true;
-        }
-        if (keyCode == 65) { // a
-            user.left = true;
-        }
-        if (keyCode == 87) { // w
-            user.up = true;
-        }
-        if (keyCode == 83) { // s
-            user.down = true;
-        }
-        if (keyCode == 32 && user.jumps < 2) { // space bar
-            user.dy = -20;
-            user.jumps++;
-        }
-
-    }//keyPressed()
+    }
 
     public void keyReleased(KeyEvent event) {
         char key = event.getKeyChar();
         int keyCode = event.getKeyCode();
-        //This method will do something when a key is released
-        if (keyCode == 68) { // d
-            user.right = false;
-        }
-        if (keyCode == 65) { // a
-            user.left = false;
-        }
-        if (keyCode == 87) { // w
-            user.up = false;
-        }
-        if (keyCode == 83) { // s
-            user.down = false;
-        }
-//        if (keyCode == 32 && user.ypos == 250) { // space bar
-//            user.dy = -15;
-//        }
-
-    }//keyReleased()
+    }
 
     public void keyTyped(KeyEvent event) {
         // handles a press of a character key (any key that can be printed but not keys like SHIFT)
@@ -253,6 +243,178 @@ public class CheeseWorld implements Runnable, KeyListener {
         } catch (InterruptedException e) {
 
         }
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+
+        int x, y;
+        x = e.getX();
+        y = e.getY();
+
+        mouseX = x;
+        mouseY = y;
+        System.out.println();
+        System.out.println("Mouse Clicked at " + x + ", " + y);
+//SELECTING A COLOR
+        if (RedRec.rec.contains(x,y)) {
+            colorCount=1;}
+        if (OrangeRec.rec.contains(x,y)) {
+            colorCount=2;}
+        if (GoldRec.rec.contains(x,y)) {
+            colorCount=3;}
+        if (YellowRec.rec.contains(x,y)) {
+            colorCount=4;}
+        if (LimeRec.rec.contains(x,y)) {
+            colorCount=5;}
+        if (GreenRec.rec.contains(x,y)) {
+            colorCount=6;}
+        if (TealRec.rec.contains(x,y)) {
+            colorCount=7;}
+        if (NavyRec.rec.contains(x,y)) {
+            colorCount=8;}
+        if (VioletRec.rec.contains(x,y)) {
+            colorCount=9;}
+        if (PurpleRec.rec.contains(x,y)) {
+            colorCount=10;}
+        if (PinkRec.rec.contains(x,y)) {
+            colorCount=11;}
+        if (BlackRec.rec.contains(x,y)) {
+            colorCount=12;}
+        if (WhiteRec.rec.contains(x,y)) {
+            colorCount=13;}
+        if (BrownRec.rec.contains(x,y)) {
+            colorCount=14;}
+        if (EraseRec.rec.contains(x,y)){
+            colorCount=0;
+        }
+
+        //COLORING
+        for (int c = 0; c < rectangles.length; c++) {
+            for (int r = 0; r < rectangles.length; r++) {
+                if (rectangles[c][r].rec.contains(x, y)) {
+                rectangles[c][r].colorCode=colorCount;
+                }
+            }
+        }
+        for (int c = 0; c < rectangles.length; c++) {
+            for (int r = 0; r < rectangles.length; r++) {
+                if (rectangles[c][r].colorCode==1) {
+                    rectangles[c][r].pic = RedPic;
+                }            }
+        }
+        for (int c = 0; c < rectangles.length; c++) {
+            for (int r = 0; r < rectangles.length; r++) {
+                if (rectangles[c][r].colorCode==0) {
+                    rectangles[c][r].pic = EmptyPixelPic;
+                }            }
+        }
+        for (int c = 0; c < rectangles.length; c++) {
+            for (int r = 0; r < rectangles.length; r++) {
+                if (rectangles[c][r].colorCode==2) {
+                    rectangles[c][r].pic = OrangePic;
+                }            }
+        }
+        for (int c = 0; c < rectangles.length; c++) {
+            for (int r = 0; r < rectangles.length; r++) {
+                if (rectangles[c][r].colorCode==3) {
+                    rectangles[c][r].pic = GoldPic;
+                }            }
+        }
+        for (int c = 0; c < rectangles.length; c++) {
+            for (int r = 0; r < rectangles.length; r++) {
+                if (rectangles[c][r].colorCode==4) {
+                    rectangles[c][r].pic = YellowPic;
+                }            }
+        }
+        for (int c = 0; c < rectangles.length; c++) {
+            for (int r = 0; r < rectangles.length; r++) {
+                if (rectangles[c][r].colorCode==5) {
+                    rectangles[c][r].pic = LimePic;
+                }            }
+        }
+        for (int c = 0; c < rectangles.length; c++) {
+            for (int r = 0; r < rectangles.length; r++) {
+                if (rectangles[c][r].colorCode==6) {
+                    rectangles[c][r].pic = GreenPic;
+                }            }
+        }
+        for (int c = 0; c < rectangles.length; c++) {
+            for (int r = 0; r < rectangles.length; r++) {
+                if (rectangles[c][r].colorCode==7) {
+                    rectangles[c][r].pic = TealPic;
+                }            }
+        }
+        for (int c = 0; c < rectangles.length; c++) {
+            for (int r = 0; r < rectangles.length; r++) {
+                if (rectangles[c][r].colorCode==8) {
+                    rectangles[c][r].pic = NavyPic;
+                }            }
+        }
+        for (int c = 0; c < rectangles.length; c++) {
+            for (int r = 0; r < rectangles.length; r++) {
+                if (rectangles[c][r].colorCode==9) {
+                    rectangles[c][r].pic = VioletPic;
+                }            }
+        }
+        for (int c = 0; c < rectangles.length; c++) {
+            for (int r = 0; r < rectangles.length; r++) {
+                if (rectangles[c][r].colorCode==10) {
+                    rectangles[c][r].pic = PurplePic;
+                }            }
+        }
+        for (int c = 0; c < rectangles.length; c++) {
+            for (int r = 0; r < rectangles.length; r++) {
+                if (rectangles[c][r].colorCode==11) {
+                    rectangles[c][r].pic = PinkPic;
+                }            }
+        }
+        for (int c = 0; c < rectangles.length; c++) {
+            for (int r = 0; r < rectangles.length; r++) {
+                if (rectangles[c][r].colorCode==12) {
+                    rectangles[c][r].pic = BlackPic;
+                }            }
+        }
+        for (int c = 0; c < rectangles.length; c++) {
+            for (int r = 0; r < rectangles.length; r++) {
+                if (rectangles[c][r].colorCode==13) {
+                    rectangles[c][r].pic = WhitePic;
+                }            }
+        }
+        for (int c = 0; c < rectangles.length; c++) {
+            for (int r = 0; r < rectangles.length; r++) {
+                if (rectangles[c][r].colorCode==14) {
+                    rectangles[c][r].pic = BrownPic;
+                }            }
+        }
+        if(ResetRec.rec.contains(x,y)){
+            for (int c = 0; c < rectangles.length; c++) {
+                for (int r = 0; r < rectangles.length; r++) {
+                    rectangles[c][r]=new Rectangles(r*50,c*50, EmptyPixelPic,0);
+                }
+            }
+        }
+
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
     }
 
 }//class
